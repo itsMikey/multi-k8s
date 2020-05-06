@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: postgres
+  template:
+    metadata:
+      labels:
+        component: postgres
+    spec:
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            # name in our PVC config file
+            # THIS IS WHAT tells kubernetes to allocate storage from hard drive or our cloud storage
+            claimName: database-persistent-volume-claim
+      containers:
+        - name: postgres
+          image: postgres
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+              subPath: postgres
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  # name is the name of the secret, not the key value stored in it.
+                  name: pgpassword
+                  key: PGPASSWORD
+          # This says hey, we got our storage allocated above and here is how we want it used in our container.
+          volumeMounts:
+            # go out to volumes entry and find one that matches (this matches the one above btw)
+            - name: postgres-storage
+              # the data folder that Postgres saves to
+              mountPath: /var/lib/postgresql/data
+              # this is postgres specific. This is the nested folder in our volume claim. 
+              subPath: postgres
+            
+        
