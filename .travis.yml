@@ -1,0 +1,37 @@
+sudo: required
+services:
+  - docker
+env:
+  global:
+    # define our global git SHA to be used in our deploy script for tagging our images
+    - SHA=$(git rev-parse HEAD)
+    # disable required user inputs in google console.
+    - CLOUDSDK_CORE_DISABLE_PROMPTS=1
+before_install:
+  - openssl aes-256-cbc -K $encrypted_0c35eebf403c_key -iv $encrypted_0c35eebf403c_iv -in service-account.json.enc -out service-account.json -d
+  # download Google Cloud SDK and install it locally on our little instance created by Travis
+  - curl https://sdk.cloud.google.com | bash > /dev/null
+  - source $HOME/google-cloud-sdk/path.bash.inc
+  - gcloud components update kubectl
+  # in AWS we created IAM user to give permission to travis to push to our account. We do the same for google cloud but it will be in our service-account.json file. Travis decrypts our service-account.json.enc and adds it to our root directory
+  - gloud auth activate-service-account --key-file service-account.json
+  # get ID of our multi-k8s project in Google cloud
+  - gcloud config set project multi-k8s-276414 
+  # get the zone of our project and append to this line on the clusters page in the table view
+  - gcloud config set compute/zone us-west1-a 	
+  # add the name of our cluster from that same page
+  - gcloud container clusters get-credentials multi-cluster
+  # this will log us into the docker registry. We get these env variables from our project in travis that we set manually
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  # build our docker image
+  - docker build -t immikey/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+  - docker run -e CI=true immikey/react-test npm run test -- --coverage
+  
+# for deployment, we are telling travis to do nothing except run our script. For AWS, we had all our deployment info here and travis took care of it. We are going to create a script to take care of our Kubernetes deployment
+deploy:
+  provider: script
+  script: bash ./deploy.sh
+  on:
+    branch: master
