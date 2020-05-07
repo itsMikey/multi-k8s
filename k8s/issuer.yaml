@@ -1,15 +1,16 @@
 # issuer
-apiVersion: certmanager.k8s.io/v1alpha1
+apiVersion: certmanager.k8s.io/v1alpha2
 kind: ClusterIssuer
 metadata:
   name: letsencrypt-prod
 spec:
-  acme: 
+  acme:
     server: https://acme-v02.api.letsencrypt.org/directory
     email: 'mikey.aburamadan@gmail.com'
-    # LetsEncrypt sends over this secret to kubernetes just to verify we own domain. we dont actually use it but k8s does
+     # LetsEncrypt sends over this secret to kubernetes just to verify we own domain. we dont actually use it but k8s does
     privateKeySecretRef:
       name: letsencrypt-prod
-    http01: {}
-      
-    
+    solvers:
+      - http01:
+          ingress:
+            class: nginx
