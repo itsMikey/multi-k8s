@@ -14,7 +14,7 @@ before_install:
   - source $HOME/google-cloud-sdk/path.bash.inc
   - gcloud components update kubectl
   # in AWS we created IAM user to give permission to travis to push to our account. We do the same for google cloud but it will be in our service-account.json file. Travis decrypts our service-account.json.enc and adds it to our root directory
-  - gloud auth activate-service-account --key-file service-account.json
+  - gcloud auth activate-service-account --key-file service-account.json
   # get ID of our multi-k8s project in Google cloud
   - gcloud config set project multi-k8s-276414 
   # get the zone of our project and append to this line on the clusters page in the table view
