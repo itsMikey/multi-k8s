@@ -1,0 +1,24 @@
+# certificate
+apiVersion: cert-manager.io/v1alpha2
+kind: Certificate
+metadata:
+  name: helladiversity-com-tls
+spec:
+  # name of our secret in gcloud
+  secretName: helladiversity-com
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  commonName: helladiversity.com
+  # list of domain names to be associated with certificate
+  dnsNames:
+    - helladiversity.com
+    - www.helladiversity.com
+  acme:
+    config:
+       - http01:
+           ingressClass: nginx
+           domains:
+            - helladiversity.com
+            - www.helladiversity.com
+      
