@@ -16,9 +16,9 @@ spec:
     - www.helladiversity.com
   acme:
     config:
-       - http01:
-           ingressClass: nginx
-           domains:
-            - helladiversity.com
-            - www.helladiversity.com
+      - http01:
+          ingressClass: nginx
+        domains:
+          - helladiversity.com
+          - www.helladiversity.com
       
