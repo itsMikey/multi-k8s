@@ -1,5 +1,5 @@
 # certificate
-apiVersion: cert-manager.io/v1alpha2
+apiVersion: cert-manager.io/v1alpha1
 kind: Certificate
 metadata:
   name: helladiversity-com-tls
@@ -14,11 +14,11 @@ spec:
   dnsNames:
     - helladiversity.com
     - www.helladiversity.com
-  # acme:
-  #   config:
-  #     - http01:
-  #         ingressClass: nginx
-  #       domains:
-  #         - helladiversity.com
-  #         - www.helladiversity.com
+  acme:
+    config:
+      - http01:
+          ingressClass: nginx
+        domains:
+          - helladiversity.com
+          - www.helladiversity.com
       
