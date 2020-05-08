@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
     name: server-deployment
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       component: server
@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: server
-          image: stephengrider/multi-server
+          image: immikey/multi-server
           ports:
             - containerPort: 5000
           env:

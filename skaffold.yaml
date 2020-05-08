@@ -1,0 +1,41 @@
+apiVersion: skaffold/v1beta2
+kind: Config
+build:
+  # list all different deployments we want skaffold to handle
+  local:
+    # by default, skaffold will try to push our images to docker hub or some repo. This disables that
+    push: false
+  artifacts:
+    # the images we want skaffold to manage
+    - image: immikey/multi-client
+      context: client
+      docker:
+        dockerfile: Dockerfile.dev
+      sync:
+        # anytime we see a file of these types change, inject it in our multi-client pod
+        '**/*.js': .
+        '**/*.css': .
+        '**/*.html': .
+    - image: immikey/multi-server
+      context: server
+      docker:
+        dockerfile: Dockerfile.dev
+      sync:
+        '**/*.js': .
+    - image: immikey/multi-worker
+      context: worker
+      docker:
+        dockerfile: Dockerfile.dev
+      sync:
+        '**/*.js': .
+deploy:
+  kubectl:
+    manifests:
+      # all different k8s config files that we want skaffold to manage for us
+      # apply this config file for our client pod
+      # dont add configs w/ persistent volumes, it would delete all your POSTGRES data for example
+      - k8s/client-deployment.yaml
+      - k8s/server-deployment.yaml
+      - k8s/worker-deployment.yaml
+      - k8s/server-cluster-ip-service.yaml
+      - k8s/client-cluster-ip-service.yaml
